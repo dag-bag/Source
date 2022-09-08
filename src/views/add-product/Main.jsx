@@ -1,5 +1,6 @@
 /** @format */
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   Lucide,
   Tippy,
@@ -7,31 +8,118 @@ import {
   Alert,
   ClassicEditor,
 } from "@/base-components";
+import axios from "axios";
 import { faker as $f } from "@/utils";
 import * as $_ from "lodash";
 import { useState } from "react";
+import { atom, selector, useRecoilValue } from "recoil";
+const productAtom = selector({
+  key: "productAtom",
+  get: async () => {},
+});
 
 function Main() {
-  const [subcategory, setSubcategory] = useState([]);
+  const [subcategory, setSubcategory] = useState("General");
+  const [pic, setPic] = useState("");
+
+  const postDetails = (pic) => {
+    if (!pic) {
+      toast.error("Please select a profile picture");
+    }
+
+    if (pic.type === "image/jpeg" || "image/png") {
+      const data = new FormData();
+      data.append("file", pic);
+      data.append("upload_preset", "chat-app");
+      data.append("cloud_name", "hellooworkd");
+      fetch("https://api.cloudinary.com/v1_1/hellooworkd/image/upload", {
+        method: "post",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setPic(data.url.toString());
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  // const respData = await fetch("http://localhost:3000/api/products", {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   body: JSON.stringify({
+  //     ...product,
+  //   }),
+  // });
+  const capitalizeFirst = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  const [active, setActive] = useState(false);
+  let ca = "milftoons  .if you do. Life in woodenchester";
   const [product, setProduct] = useState({
     title: "",
     desc: "",
     slug: "",
-    img: "",
-    category: "",
+
+    category: "slipers",
     color: "",
     size: "",
     price: 0,
     availableQty: 0,
-    tag: "",
+    tag: "General",
   });
   const handleChange = (e) => {
     setProduct((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    console.log(product);
   };
   const [editorData, setEditorData] = useState("<p>Content of the editor.</p>");
-  console.log(product);
+  const handleSubimt = async (e) => {
+    product.img = pic;
+    let array = [];
+
+    array.push(product);
+    console.log(array);
+
+    const id = toast.loading("Creating please wait!", {
+      position: "bottom-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+
+    const respData = await fetch("http://localhost:3001/api/product", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(array),
+    });
+    const resp = await respData.json();
+    const { success, msg, error } = resp;
+    console.log(success, msg, error);
+    if (success) {
+      toast.update(id, { render: msg, type: "success", isLoading: false });
+    }
+
+    if (error) {
+      toast.update(id, { render: error, type: "error", isLoading: false });
+    }
+    const productData = await fetch("http://localhost:3001/api/product");
+    const all = await productData.json();
+    console.log(all);
+  };
+
   return (
     <>
+      <ToastContainer />
       <div className="intro-y flex items-center mt-8">
         <h2 className="text-lg font-medium mr-auto">Add Product</h2>
       </div>
@@ -122,24 +210,11 @@ function Main() {
                   </div>
                   <div className="w-full mt-3 xl:mt-0 flex-1 border-2 border-dashed dark:border-darkmode-400 rounded-md pt-4">
                     <div className="grid grid-cols-10 gap-5 pl-4 pr-5">
-                      {$_.take($f(), 5).map((faker, fakerKey) => (
-                        <div
-                          key={fakerKey}
-                          className="col-span-5 md:col-span-2 h-28 relative image-fit cursor-pointer zoom-in"
-                        >
-                          <img
-                            className="rounded-md"
-                            alt="Midone - HTML Admin Template"
-                            src={faker.photos[0]}
-                          />
-                          <Tippy
-                            content="Remove this image?"
-                            className="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2"
-                          >
-                            <Lucide icon="X" className="w-4 h-4" />
-                          </Tippy>
-                        </div>
-                      ))}
+                      <img
+                        className="rounded-md w-20 h-20 object-cover col-span-2"
+                        alt="Midone - HTML Admin Template"
+                        src={pic}
+                      />
                     </div>
                     <div className="px-4 pb-4 mt-5 flex items-center justify-center cursor-pointer relative">
                       <Lucide icon="Image" className="w-4 h-4 mr-2" />
@@ -151,6 +226,9 @@ function Main() {
                         id="horizontal-form-1"
                         type="file"
                         className="w-full h-full top-0 left-0 absolute opacity-0"
+                        onChange={(e) => {
+                          postDetails(e.target.files[0]);
+                        }}
                       />
                     </div>
                   </div>
@@ -216,13 +294,19 @@ function Main() {
                       id="category"
                       name="category"
                       value={product.category}
+                      onChange={handleChange}
                       className="form-select"
                     >
-                      {$_.take($f(), 9).map((faker, fakerKey) => (
+                      <option value="slipers">Slipers</option>
+                      <option value="slipers">Slipers</option>
+                      <option value="slipers">Slipers</option>
+                      <option value="slipers">Slipers</option>
+                      <option value="slipers">Slipers</option>
+                      {/* {$_.take($f(), 9).map((faker, fakerKey) => (
                         <option key={fakerKey} value={faker.categories[0].name}>
                           {faker.categories[0].name}
                         </option>
-                      ))}
+                      ))} */}
                     </select>
                   </div>
                 </div>
@@ -239,25 +323,17 @@ function Main() {
                     </div>
                   </div>
                   <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <select name="" id="">
-                      <TomSelect
-                        value={subcategory}
-                        onChange={setSubcategory}
-                        options={{
-                          placeholder: "Etalase",
-                        }}
-                        className="w-full"
-                        multiple
-                      >
-                        {$_.take($f(), 2).map((faker, fakerKey) => (
-                          <option
-                            key={fakerKey}
-                            value={faker.categories[0].name}
-                          >
-                            {faker.categories[0].name}
-                          </option>
-                        ))}
-                      </TomSelect>
+                    <select
+                      id="tag"
+                      name="tag"
+                      value={product.tag}
+                      onChange={handleChange}
+                      className="form-select"
+                    >
+                      <option value="General">General</option>
+                      <option value="Recommended">Recommended</option>
+                      <option value="Top">Top</option>
+                      <option value="Best Seller">Best Seller</option>
                     </select>
                   </div>
                 </div>
@@ -343,10 +419,16 @@ function Main() {
                     </div>
                   </div>
                   <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <ClassicEditor
-                      value={editorData}
-                      onChange={setEditorData}
+                    <textarea
+                      name="desc"
+                      value={product.desc}
+                      onChange={handleChange}
+                      placeholder="Product Description"
+                      rows={5}
+                      className="form-textarea"
+                      cols={30}
                     />
+
                     <div className="form-help text-right">
                       Maximum character 0/2000
                     </div>
@@ -443,21 +525,33 @@ function Main() {
                       </a>
                       <div>
                         <div className="form-inline mt-5 first:mt-0">
-                          <label className="form-label sm:w-20">Name</label>
-                          <div className="flex items-center flex-1 xl:pr-20">
-                            <div className="input-group flex-1">
-                              <input
-                                type="text"
-                                className="form-control"
-                                placeholder="Size"
-                              />
-                              <div className="input-group-text">6/14</div>
-                            </div>
+                          <label className="form-label mt-2 sm:w-20">
+                            Size
+                          </label>
+                          <div className="w-full mt-3 xl:mt-0 flex-1">
+                            <select
+                              id="category"
+                              name="size"
+                              value={product.size}
+                              onChange={handleChange}
+                              className="form-select"
+                            >
+                              <option value="SM">SM</option>
+                              <option value="XL">XL</option>
+                              <option value="XXL">XXl</option>
+                              <option value="LG">LG</option>
+
+                              {/* {$_.take($f(), 9).map((faker, fakerKey) => (
+                        <option key={fakerKey} value={faker.categories[0].name}>
+                          {faker.categories[0].name}
+                        </option>
+                      ))} */}
+                            </select>
                           </div>
                         </div>
                         <div className="form-inline mt-5 items-start first:mt-0">
                           <label className="form-label mt-2 sm:w-20">
-                            Options
+                            slug
                           </label>
                           <div className="flex-1">
                             <div className="xl:flex items-center mt-5 first:mt-0">
@@ -465,55 +559,47 @@ function Main() {
                                 <input
                                   type="text"
                                   className="form-control"
-                                  placeholder="Small"
+                                  placeholder="slug"
+                                  onChange={handleChange}
+                                  name="slug"
+                                  value={product.slug}
                                 />
                                 <div className="input-group-text">6/14</div>
                               </div>
-                              <div className="w-20 flex text-slate-500 mt-3 xl:mt-0">
-                                <a href="" className="xl:ml-5">
-                                  <Lucide icon="Move" className="w-4 h-4" />
-                                </a>
-                                <a href="" className="ml-3 xl:ml-5">
-                                  <Lucide icon="Trash2" className="w-4 h-4" />
-                                </a>
-                              </div>
                             </div>
-                            <div className="xl:flex items-center mt-5 first:mt-0">
-                              <div className="input-group flex-1">
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Medium"
-                                />
-                                <div className="input-group-text">6/14</div>
-                              </div>
-                              <div className="w-20 flex text-slate-500 mt-3 xl:mt-0">
-                                <a href="" className="xl:ml-5">
-                                  <Lucide icon="Move" className="w-4 h-4" />
-                                </a>
-                                <a href="" className="ml-3 xl:ml-5">
-                                  <Lucide icon="Trash2" className="w-4 h-4" />
-                                </a>
-                              </div>
-                            </div>
-                            <div className="xl:flex items-center mt-5 first:mt-0">
-                              <div className="input-group flex-1">
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Large"
-                                />
-                                <div className="input-group-text">6/14</div>
-                              </div>
-                              <div className="w-20 flex text-slate-500 mt-3 xl:mt-0">
-                                <a href="" className="xl:ml-5">
-                                  <Lucide icon="Move" className="w-4 h-4" />
-                                </a>
-                                <a href="" className="ml-3 xl:ml-5">
-                                  <Lucide icon="Trash2" className="w-4 h-4" />
-                                </a>
-                              </div>
-                            </div>
+                          </div>
+                        </div>
+                        <div className="form-inline mt-5 items-start first:mt-0">
+                          <label className="form-label mt-2 sm:w-20">
+                            color
+                          </label>
+                          <div className="w-full mt-3 xl:mt-0 flex-1">
+                            <input
+                              type="text"
+                              className="form-control capitalize"
+                              placeholder="color"
+                              onChange={handleChange}
+                              name="color"
+                              value={product.color}
+                            />
+                            {/* <select
+                              id="category"
+                              name="category"
+                              value={product.category}
+                              onChange={handleChange}
+                              className="form-select"
+                            >
+                              <option value="slipers">Slipers</option>
+                              <option value="slipers">Slipers</option>
+                              <option value="slipers">Slipers</option>
+                              <option value="slipers">Slipers</option>
+                              <option value="slipers">Slipers</option>
+                              {/* {$_.take($f(), 9).map((faker, fakerKey) => (
+                        <option key={fakerKey} value={faker.categories[0].name}>
+                          {faker.categories[0].name}
+                        </option>
+                      ))} */}
+                            {/* </select> */}
                           </div>
                         </div>
                         <div className="xl:ml-20 xl:pl-5 xl:pr-20 mt-5 first:mt-0">
@@ -657,15 +743,21 @@ function Main() {
                           type="text"
                           className="form-control"
                           placeholder="Price"
+                          name="price"
+                          value={product.price}
+                          onChange={handleChange}
                         />
                       </div>
                       <input
-                        type="text"
+                        type="number"
                         className="form-control mt-2 sm:mt-0"
                         placeholder="Stock"
+                        name="availableQty"
+                        value={product.availableQty}
+                        onChange={handleChange}
                       />
                       <input
-                        type="text"
+                        type="number"
                         className="form-control mt-2 sm:mt-0"
                         placeholder="Variant Code"
                       />
@@ -1157,6 +1249,13 @@ function Main() {
                         id="product-status-active"
                         className="form-check-input"
                         type="checkbox"
+                        name="active"
+                        onChange={() => {
+                          setActive(!active);
+                          console.log(active);
+                        }}
+                        value={active}
+                        checked={active}
                       />
                       <label
                         className="form-check-label"
@@ -1493,6 +1592,9 @@ function Main() {
             <button
               type="button"
               className="btn py-3 btn-primary w-full md:w-52"
+              onClick={(e) => {
+                handleSubimt(e);
+              }}
             >
               Save
             </button>
