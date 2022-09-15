@@ -130,7 +130,7 @@ function Main() {
   const [sizes, setSizes] = useState(10);
 
   const handleSubimt = async (e) => {
-    console.log({ pic });
+    // console.log({ pic });
     console.log(product);
 
     const id = toast.loading("Creating please wait!", {
@@ -143,7 +143,7 @@ function Main() {
       progress: undefined,
     });
 
-    const respData = await fetch("http://localhost:3001/api/product", {
+    const respData = await fetch("https://incascestor.vercel.app/api/product", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -160,9 +160,9 @@ function Main() {
     if (error) {
       toast.update(id, { render: error, type: "error", isLoading: false });
     }
-    const productData = await fetch("http://localhost:3001/api/product");
-    const all = await productData.json();
-    console.log(all);
+    // const productData = await fetch("http://localhost:3001/api/product");
+    // const all = await productData.json();
+    // console.log(all);
   };
 
   return (
