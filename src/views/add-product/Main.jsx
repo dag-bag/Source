@@ -133,36 +133,36 @@ function Main() {
     console.log({ pic });
     console.log(product);
 
-    // const id = toast.loading("Creating please wait!", {
-    //   position: "bottom-center",
-    //   autoClose: 5000,
-    //   hideProgressBar: false,
-    //   closeOnClick: true,
-    //   pauseOnHover: true,
-    //   draggable: true,
-    //   progress: undefined,
-    // });
+    const id = toast.loading("Creating please wait!", {
+      position: "bottom-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
 
-    // const respData = await fetch("http://localhost:3001/api/product", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(product),
-    // });
-    // const resp = await respData.json();
-    // const { success, msg, error } = resp;
-    // console.log(success, msg, error);
-    // if (success) {
-    //   toast.update(id, { render: msg, type: "success", isLoading: false });
-    // }
+    const respData = await fetch("http://localhost:3001/api/product", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(product),
+    });
+    const resp = await respData.json();
+    const { success, msg, error } = resp;
+    console.log(success, msg, error);
+    if (success) {
+      toast.update(id, { render: msg, type: "success", isLoading: false });
+    }
 
-    // if (error) {
-    //   toast.update(id, { render: error, type: "error", isLoading: false });
-    // }
-    // const productData = await fetch("http://localhost:3001/api/product");
-    // const all = await productData.json();
-    // console.log(all);
+    if (error) {
+      toast.update(id, { render: error, type: "error", isLoading: false });
+    }
+    const productData = await fetch("http://localhost:3001/api/product");
+    const all = await productData.json();
+    console.log(all);
   };
 
   return (
