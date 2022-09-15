@@ -97,11 +97,11 @@ function Main() {
     setProduct(temp);
   };
 
-  const [customSize, setCustomSize] = useState();
+  const [customSize, setCustomSize] = useState("");
 
   const addCSizes = (e, i) => {
     let temp = { ...product };
-    let size = parseInt(e.target.value);
+    let size = parseInt(e);
 
     temp.variant[i].size = [...temp.variant[i].size, size];
     setProduct(temp);
@@ -483,6 +483,36 @@ function Main() {
                                 </div>
                               </div>
                             </div>
+                            <div className="form-inline mt-5 items-start first:mt-0">
+                              <label className="form-label mt-2 sm:w-20">
+                                Add Url Img
+                              </label>
+                              <div className="flex-1">
+                                <div className="xl:flex items-center mt-5 first:mt-0">
+                                  <div className="input-group flex-1">
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      placeholder="url like this: /product/your-slug"
+                                      onChange={(e) => {
+                                        setPic(e.target.value);
+                                      }}
+                                      name="slug"
+                                      value={pic}
+                                    />
+                                    <button
+                                      className="input-group-text"
+                                      onClick={() => {
+                                        addImages(index, pic);
+                                        setPic("");
+                                      }}
+                                    >
+                                      ADD URL
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                             <div className="form-inline mt-5 first:mt-0">
                               <label className="form-label mt-2 sm:w-20">
                                 Size
@@ -540,7 +570,7 @@ function Main() {
 
                                     //  sizes.find((item) => item === e.target.value)
                                     // setSizes([...sizes, e.target.value]);
-                                    addCSizes(e, index);
+                                    addCSizes(e.target.value, index);
                                   }}
                                   className="form-select"
                                 >
@@ -553,7 +583,7 @@ function Main() {
                             </div>
                             <div className="form-inline mt-5 items-start first:mt-0">
                               <label className="form-label mt-2 sm:w-20">
-                                Custom Size
+                                Add Size
                               </label>
                               <div className="flex-1">
                                 <div className="xl:flex items-center mt-5 first:mt-0">
@@ -561,21 +591,23 @@ function Main() {
                                     <input
                                       type="text"
                                       className="form-control"
-                                      name="size"
-                                      placeholder="Add your custom size"
+                                      placeholder="Please Add Your Custom Size"
                                       onChange={(e) => {
                                         setCustomSize(e.target.value);
                                       }}
+                                      name="customSize"
                                       value={customSize}
                                     />
+                                    <button
+                                      className="input-group-text"
+                                      onClick={() => {
+                                        addCSizes(customSize, index);
+                                        setCustomSize("");
+                                      }}
+                                    >
+                                      ADD SIZE
+                                    </button>
                                   </div>
-                                  <button
-                                    onClick={() => {
-                                      addCSizes(customSize, index);
-                                    }}
-                                  >
-                                    Add
-                                  </button>
                                 </div>
                               </div>
                             </div>
@@ -681,597 +713,12 @@ function Main() {
                     Variant
                   </button>
                 </div>
-                <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
-                  <div className="form-label xl:w-64 xl:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">Variant Information</div>
-                      </div>
-                      <div className="leading-relaxed text-slate-500 text-xs mt-3">
-                        Apply price and stock on all variants or based on
-                        certain variant codes.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <div className="sm:grid grid-cols-4 gap-2">
-                      <div className="input-group">
-                        <div className="input-group-text">$</div>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Price"
-                          name="price"
-                          value={product.price}
-                          onChange={handleChange}
-                        />
-                      </div>
-                      <input
-                        type="number"
-                        className="form-control mt-2 sm:mt-0"
-                        placeholder="Stock"
-                        name="availableQty"
-                        value={product.availableQty}
-                        onChange={handleChange}
-                      />
-                      <input
-                        type="number"
-                        className="form-control mt-2 sm:mt-0"
-                        placeholder="Variant Code"
-                      />
-                      <button className="btn btn-primary mt-2 sm:mt-0">
-                        Apply To All
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
-                  <div className="form-label xl:w-64 xl:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">Variant List</div>
-                      </div>
-                      <div className="leading-relaxed text-slate-500 text-xs mt-3">
-                        Set the price and stock for each variant.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <div className="overflow-x-auto">
-                      <table className="table border">
-                        <thead>
-                          <tr>
-                            <th className="bg-slate-50 dark:bg-darkmode-800 text-slate-500 whitespace-nowrap">
-                              Size
-                            </th>
-                            <th className="bg-slate-50 dark:bg-darkmode-800 text-slate-500 whitespace-nowrap">
-                              <div className="flex items-center">
-                                Color{" "}
-                                <Lucide
-                                  icon="HelpCircle"
-                                  className="w-4 h-4 ml-2"
-                                />
-                              </div>
-                            </th>
-                            <th className="bg-slate-50 dark:bg-darkmode-800 text-slate-500 whitespace-nowrap !px-2">
-                              Price
-                            </th>
-                            <th className="bg-slate-50 dark:bg-darkmode-800 text-slate-500 whitespace-nowrap !px-2">
-                              <div className="flex items-center">
-                                <div className="relative w-4 h-4 mr-2 -mt-0.5 before:content-[''] before:absolute before:w-4 before:h-4 before:bg-primary/20 before:rounded-full lg:before:animate-ping after:content-[''] after:absolute after:w-4 after:h-4 after:bg-primary after:rounded-full after:border-4 after:border-white/60 after:dark:border-darkmode-300"></div>
-                                Stock{" "}
-                                <Lucide
-                                  icon="HelpCircle"
-                                  className="w-4 h-4 ml-2"
-                                />
-                              </div>
-                            </th>
-                            <th className="bg-slate-50 dark:bg-darkmode-800 text-slate-500 whitespace-nowrap !pl-2">
-                              Variant Code
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td rowSpan="3" className="border-r">
-                              Small
-                            </td>
-                            <td>Black</td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Stock"
-                              />
-                            </td>
-                            <td className="!pl-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Variant Code"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>White</td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Stock"
-                              />
-                            </td>
-                            <td className="!pl-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Variant Code"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Gray</td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Stock"
-                              />
-                            </td>
-                            <td className="!pl-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Variant Code"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td rowSpan="3" className="border-r">
-                              Medium
-                            </td>
-                            <td>Black</td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Stock"
-                              />
-                            </td>
-                            <td className="!pl-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Variant Code"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>White</td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Stock"
-                              />
-                            </td>
-                            <td className="!pl-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Variant Code"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Gray</td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Stock"
-                              />
-                            </td>
-                            <td className="!pl-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Variant Code"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td rowSpan="3" className="border-r">
-                              Large
-                            </td>
-                            <td>Black</td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Stock"
-                              />
-                            </td>
-                            <td className="!pl-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Variant Code"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>White</td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Stock"
-                              />
-                            </td>
-                            <td className="!pl-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Variant Code"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Gray</td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Stock"
-                              />
-                            </td>
-                            <td className="!pl-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Variant Code"
-                              />
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-                <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
-                  <div className="form-label xl:w-64 xl:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">Wholesale</div>
-                      </div>
-                      <div className="leading-relaxed text-slate-500 text-xs mt-3">
-                        Add wholesale price for certain quantity purchases.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <div className="overflow-x-auto">
-                      <table className="table border">
-                        <thead>
-                          <tr>
-                            <th className="!pr-2 bg-slate-50 dark:bg-darkmode-800"></th>
-                            <th className="bg-slate-50 dark:bg-darkmode-800"></th>
-                            <th className="!px-2 bg-slate-50 dark:bg-darkmode-800 text-slate-500 whitespace-nowrap">
-                              Min.
-                            </th>
-                            <th className="!px-2 bg-slate-50 dark:bg-darkmode-800 text-slate-500 whitespace-nowrap">
-                              Max.
-                            </th>
-                            <th className="!px-2 bg-slate-50 dark:bg-darkmode-800 text-slate-500 whitespace-nowrap">
-                              Unit Price
-                            </th>
-                            <th className="!px-2 bg-slate-50 dark:bg-darkmode-800"></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className="!pr-2">1.</td>
-                            <td className="whitespace-nowrap">
-                              Wholesale Price 1
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Min Qty"
-                              />
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Max Qty"
-                              />
-                            </td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!pl-4 text-slate-500">
-                              <a href="">
-                                <Lucide icon="Trash2" className="w-4 h-4" />
-                              </a>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="!pr-2">2.</td>
-                            <td className="whitespace-nowrap">
-                              Wholesale Price 2
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Min Qty"
-                              />
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Max Qty"
-                              />
-                            </td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!pl-4 text-slate-500">
-                              <a href="">
-                                <Lucide icon="Trash2" className="w-4 h-4" />
-                              </a>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="!pr-2">3.</td>
-                            <td className="whitespace-nowrap">
-                              Wholesale Price 3
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Min Qty"
-                              />
-                            </td>
-                            <td className="!px-2">
-                              <input
-                                type="text"
-                                className="form-control min-w-[6rem]"
-                                placeholder="Max Qty"
-                              />
-                            </td>
-                            <td className="!px-2">
-                              <div className="input-group">
-                                <div className="input-group-text">$</div>
-                                <input
-                                  type="text"
-                                  className="form-control min-w-[6rem]"
-                                  placeholder="Price"
-                                />
-                              </div>
-                            </td>
-                            <td className="!pl-4 text-slate-500">
-                              <a href="">
-                                <Lucide icon="Trash2" className="w-4 h-4" />
-                              </a>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <button className="btn btn-outline-primary border-dashed w-full mt-4">
-                      <Lucide icon="Plus" className="w-4 h-4 mr-2" /> Add New
-                      Wholesale Price
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
           {/* END: Product Variant (Details) */}
           {/* BEGIN: Product Management */}
-          <div className="intro-y box p-5 mt-5">
-            <div className="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
-              <div className="font-medium text-base flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5">
-                <Lucide icon="ChevronDown" className="w-4 h-4 mr-2" /> Product
-                Management
-              </div>
-              <div className="mt-5">
-                <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
-                  <div className="form-label xl:w-64 xl:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">Product Status</div>
-                        <div className="ml-2 px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-darkmode-300 dark:text-slate-400 text-xs rounded-md">
-                          Required
-                        </div>
-                      </div>
-                      <div className="leading-relaxed text-slate-500 text-xs mt-3">
-                        If the status is active, your product can be searched
-                        for by potential buyers.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <div className="form-check form-switch">
-                      <input
-                        id="product-status-active"
-                        className="form-check-input"
-                        type="checkbox"
-                        name="active"
-                        onChange={() => {
-                          setActive(!active);
-                          console.log(active);
-                        }}
-                        value={active}
-                        checked={active}
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor="product-status-active"
-                      >
-                        Active
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
-                  <div className="form-label xl:w-64 xl:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">Product Stock</div>
-                        <div className="ml-2 px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-darkmode-300 dark:text-slate-400 text-xs rounded-md">
-                          Required
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <input
-                      id="product-stock"
-                      type="text"
-                      className="form-control"
-                      placeholder="Input Product Stock"
-                    />
-                  </div>
-                </div>
-                <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
-                  <div className="form-label xl:w-64 xl:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">
-                          SKU (Stock Keeping Unit)
-                        </div>
-                        <div className="ml-2 px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-darkmode-300 dark:text-slate-400 text-xs rounded-md">
-                          Required
-                        </div>
-                      </div>
-                      <div className="leading-relaxed text-slate-500 text-xs mt-3">
-                        Use a unique SKU code if you want to mark your product.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <input
-                      id="sku"
-                      type="text"
-                      className="form-control"
-                      placeholder="Input SKU"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+
           {/* END: Product Management */}
           {/* BEGIN: Weight & Shipping */}
           <div className="intro-y box p-5 mt-5">
