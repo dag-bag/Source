@@ -155,6 +155,21 @@ function Main() {
     console.log(success, msg, error);
     if (success) {
       toast.update(id, { render: msg, type: "success", isLoading: false });
+      let ImpData = {
+        slugToValidate: "/alpaca-toys",
+        secret: "vir",
+      };
+
+      const respData = await fetch(
+        "https://incascestor.vercel.app/api/revalidate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(ImpData),
+        }
+      );
     }
 
     if (error) {
