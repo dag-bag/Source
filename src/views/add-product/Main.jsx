@@ -19,7 +19,7 @@ function Main() {
   const [allPic, setAllPic] = useState([]);
   console.log(allPic);
 
-  const postDetails = (pic) => {
+  const postDetails = (pic, index) => {
     if (!pic) {
       toast.error("Please select a profile picture");
     }
@@ -36,12 +36,14 @@ function Main() {
         .then((res) => res.json())
         .then((data) => {
           setAllPic([...allPic, data.url]);
+          addImages(index, data.url);
           // setPic(data.url.toString());
         })
         .catch((err) => {
           console.log(err);
         });
     }
+    console.log("Data", data);
   };
 
   // const respData = await fetch("http://localhost:3000/api/products", {
@@ -57,6 +59,7 @@ function Main() {
   const [active, setActive] = useState(false);
   const addNewVariant = () => {
     let a = {
+      img: [],
       color: "",
       size: [],
       price: 0,
@@ -79,21 +82,33 @@ function Main() {
     desc: "",
     category: "slipers",
     variant: [
-      {
-        color: "",
-        size: [],
-        price: 0,
-        slug: "",
-        availableQty: 0,
-      },
+      { img: [], color: "", size: [10], price: 0, slug: "", availableQty: 0 },
     ],
     tag: "General",
   });
+  let url = product.title.replace(/\s+/g, "-").toLowerCase();
+  const slugCreater = (i) => {
+    let temp = { ...product };
+    let variant = i + 1;
+    let sizes = temp.variant[i].size;
+    let Urlsize = sizes.join("-");
+    temp.variant[i].slug =
+      url + "-" + temp.variant[i].color + "-" + Urlsize + "-" + variant;
+    setProduct(temp);
+  };
+
   const [customSize, setCustomSize] = useState();
 
   const addCSizes = (e, i) => {
     let temp = { ...product };
-    temp.variant[i].size = [...temp.variant[i].size, e.target.value];
+    let size = parseInt(e.target.value);
+
+    temp.variant[i].size = [...temp.variant[i].size, size];
+    setProduct(temp);
+  };
+  const addImages = (i, img) => {
+    let temp = { ...product };
+    temp.variant[i].img = [...temp.variant[i].img, img];
     setProduct(temp);
   };
   const removeCSizes = (i, j) => {
@@ -115,41 +130,39 @@ function Main() {
   const [sizes, setSizes] = useState(10);
 
   const handleSubimt = async (e) => {
-    product.img = pic;
-    let array = [];
+    console.log({ pic });
+    console.log(product);
 
-    array.push(product);
+    // const id = toast.loading("Creating please wait!", {
+    //   position: "bottom-center",
+    //   autoClose: 5000,
+    //   hideProgressBar: false,
+    //   closeOnClick: true,
+    //   pauseOnHover: true,
+    //   draggable: true,
+    //   progress: undefined,
+    // });
 
-    const id = toast.loading("Creating please wait!", {
-      position: "bottom-center",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
+    // const respData = await fetch("http://localhost:3001/api/product", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(product),
+    // });
+    // const resp = await respData.json();
+    // const { success, msg, error } = resp;
+    // console.log(success, msg, error);
+    // if (success) {
+    //   toast.update(id, { render: msg, type: "success", isLoading: false });
+    // }
 
-    const respData = await fetch("https://incascestor.vercel.app/api/product", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(array),
-    });
-    const resp = await respData.json();
-    const { success, msg, error } = resp;
-    console.log(success, msg, error);
-    if (success) {
-      toast.update(id, { render: msg, type: "success", isLoading: false });
-    }
-
-    if (error) {
-      toast.update(id, { render: error, type: "error", isLoading: false });
-    }
-    const productData = await fetch("http://localhost:3001/api/product");
-    const all = await productData.json();
-    console.log(all);
+    // if (error) {
+    //   toast.update(id, { render: error, type: "error", isLoading: false });
+    // }
+    // const productData = await fetch("http://localhost:3001/api/product");
+    // const all = await productData.json();
+    // console.log(all);
   };
 
   return (
@@ -371,83 +384,16 @@ function Main() {
                         rows={10}
                       ></textarea>
                     </div>
-                    {/* <textarea
-                      name="desc"
-                      value={product.desc}
-                      onChange={handleChange}
-                      placeholder="Product Description"
-                      rows={5}
-                      className="form-textarea"
-                      cols={30}
-                    /> */}
 
                     <div className="form-help text-right">
                       Maximum character 0/2000
                     </div>
                   </div>
                 </div>
-                {/* <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
-                  <div className="form-label xl:w-64 xl:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">Product Video</div>
-                      </div>
-                      <div className="leading-relaxed text-slate-500 text-xs mt-3">
-                        Add a video so that buyers are more interested in your
-                        product.
-                        <a
-                          href="https://themeforest.net/item/midone-jquery-tailwindcss-html-admin-template/26366820"
-                          className="text-primary font-medium"
-                          target="blank"
-                        >
-                          Learn more.
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <button className="btn btn-outline-secondary w-40">
-                      <Lucide icon="Plus" className="w-4 h-4 mr-2" /> Add Video
-                      URL
-                    </button>
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>
-          {/* END: Product Detail */}
-          {/* BEGIN: Product Variant */}
-          {/* <div className="intro-y box p-5 mt-5">
-            <div className="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
-              <div className="font-medium text-base flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5">
-                <Lucide icon="ChevronDown" className="w-4 h-4 mr-2" /> Product
-                Variant
-              </div>
-              <div className="mt-5">
-                <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
-                  <div className="form-label sm:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">Product Variant</div>
-                      </div>
-                      <div className="leading-relaxed text-slate-500 text-xs mt-2">
-                        Add variants such as color, size, or more. Choose a
-                        maximum of 2 variant types.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full mt-3 xl:mt-0 flex-1 xl:text-right">
-                    <button className="btn btn-primary w-44">
-                      <Lucide icon="Plus" className="w-4 h-4 mr-2" /> Add
-                      Variant
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> */}
-          {/* END: Product Variant */}
-          {/* BEGIN: Product Variant (Details) */}
+
           <div className="intro-y box p-5 mt-5">
             <div className="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
               <div className="font-medium text-base flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5">
@@ -489,8 +435,8 @@ function Main() {
                               </label>
                               <div className="w-full mt-3 xl:mt-0 flex-1 border-2 border-dashed dark:border-darkmode-400 rounded-md pt-4">
                                 <div className="grid grid-cols-10 gap-5 pl-4 pr-5">
-                                  {allPic.length > 0 &&
-                                    allPic.map((pic, index) => {
+                                  {item.img.length > 0 &&
+                                    item.img.map((pic, index) => {
                                       return (
                                         <img
                                           key={index}
@@ -515,7 +461,8 @@ function Main() {
                                     type="file"
                                     className="w-full h-full top-0 left-0 absolute opacity-0"
                                     onChange={(e) => {
-                                      postDetails(e.target.files[0]);
+                                      postDetails(e.target.files[0], index);
+                                      // addImages(image, index);
                                     }}
                                   />
                                 </div>
@@ -634,7 +581,14 @@ function Main() {
                                       name="slug"
                                       value={item.slug}
                                     />
-                                    <div className="input-group-text">6/14</div>
+                                    <button
+                                      className="input-group-text"
+                                      onClick={() => {
+                                        slugCreater(index);
+                                      }}
+                                    >
+                                      Create Slug
+                                    </button>
                                   </div>
                                 </div>
                               </div>
