@@ -1,6 +1,7 @@
 /** @format */
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Formik, Field, Form } from "formik";
 import {
   Lucide,
   Tippy,
@@ -8,19 +9,15 @@ import {
   Alert,
   ClassicEditor,
 } from "@/base-components";
-import axios from "axios";
-import { faker as $f } from "@/utils";
-import * as $_ from "lodash";
+
 import { useState } from "react";
 import { atom, selector, useRecoilValue } from "recoil";
-const productAtom = selector({
-  key: "productAtom",
-  get: async () => {},
-});
+import { size } from "lodash";
 
 function Main() {
-  const [subcategory, setSubcategory] = useState("General");
   const [pic, setPic] = useState("");
+  const [allPic, setAllPic] = useState([]);
+  console.log(allPic);
 
   const postDetails = (pic) => {
     if (!pic) {
@@ -38,7 +35,8 @@ function Main() {
       })
         .then((res) => res.json())
         .then((data) => {
-          setPic(data.url.toString());
+          setAllPic([...allPic, data.url]);
+          // setPic(data.url.toString());
         })
         .catch((err) => {
           console.log(err);
@@ -55,35 +53,72 @@ function Main() {
   //     ...product,
   //   }),
   // });
-  const capitalizeFirst = (str) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
 
   const [active, setActive] = useState(false);
-  let ca = "milftoons  .if you do. Life in woodenchester";
+  const addNewVariant = () => {
+    let a = {
+      color: "",
+      size: [],
+      price: 0,
+      slug: "",
+      availableQty: 0,
+    };
+    let temp = { ...product };
+    temp.variant = [...temp.variant, a];
+    setProduct(temp);
+  };
+  const removeVariant = (i) => {
+    let temp = { ...product };
+    // temp.variant.filter((vi, i) => i !== index);
+    temp.variant.splice(i, 1);
+    setProduct(temp);
+  };
+
   const [product, setProduct] = useState({
     title: "",
     desc: "",
-    slug: "",
-
     category: "slipers",
-    color: "",
-    size: "",
-    price: 0,
-    availableQty: 0,
+    variant: [
+      {
+        color: "",
+        size: [],
+        price: 0,
+        slug: "",
+        availableQty: 0,
+      },
+    ],
     tag: "General",
   });
+  const [customSize, setCustomSize] = useState();
+
+  const addCSizes = (e, i) => {
+    let temp = { ...product };
+    temp.variant[i].size = [...temp.variant[i].size, e.target.value];
+    setProduct(temp);
+  };
+  const removeCSizes = (i, j) => {
+    let temp = { ...product };
+    temp.variant[i].size.splice(j, 1);
+    setProduct(temp);
+  };
   const handleChange = (e) => {
     setProduct((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    console.log(product);
   };
-  const [editorData, setEditorData] = useState("<p>Content of the editor.</p>");
+
+  const handleBranchChange = (e, i) => {
+    let temp = { ...product };
+    temp.variant[i][e.target.name] = e.target.value;
+    setProduct(temp);
+  };
+  console.log(product);
+
+  const [sizes, setSizes] = useState(10);
+
   const handleSubimt = async (e) => {
     product.img = pic;
     let array = [];
 
     array.push(product);
-    console.log(array);
 
     const id = toast.loading("Creating please wait!", {
       position: "bottom-center",
@@ -158,86 +193,6 @@ function Main() {
         </Alert>
         {/* BEGIN: Notification */}
         <div className="intro-y col-span-11 2xl:col-span-9">
-          {/* BEGIN: Uplaod Product */}
-          <div className="intro-y box p-5">
-            <div className="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
-              <div className="font-medium text-base flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5">
-                <Lucide icon="ChevronDown" className="w-4 h-4 mr-2" /> Upload
-                Product
-              </div>
-              <div className="mt-5">
-                <div className="flex items-center text-slate-500">
-                  <span>
-                    <Lucide icon="Lightbulb" className="w-5 h-5 text-warning" />
-                  </span>
-                  <div className="ml-2">
-                    <span className="mr-1">
-                      Avoid selling counterfeit products / violating
-                      Intellectual Property Rights, so that your products are
-                      not deleted.
-                    </span>
-                    <a
-                      href="https://themeforest.net/item/midone-jquery-tailwindcss-html-admin-template/26366820"
-                      className="text-primary font-medium"
-                      target="blank"
-                    >
-                      Learn More
-                    </a>
-                  </div>
-                </div>
-                <div className="form-inline items-start flex-col xl:flex-row mt-10">
-                  <div className="form-label w-full xl:w-64 xl:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">Product Photos</div>
-                        <div className="ml-2 px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-darkmode-300 dark:text-slate-400 text-xs rounded-md">
-                          Required
-                        </div>
-                      </div>
-                      <div className="leading-relaxed text-slate-500 text-xs mt-3">
-                        <div>
-                          The image format is .jpg .jpeg .png and a minimum size
-                          of 300 x 300 pixels (For optimal images use a minimum
-                          size of 700 x 700 pixels).
-                        </div>
-                        <div className="mt-2">
-                          Select product photos or drag and drop up to 5 photos
-                          at once here. Include min. 3 attractive photos to make
-                          the product more attractive to buyers.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full mt-3 xl:mt-0 flex-1 border-2 border-dashed dark:border-darkmode-400 rounded-md pt-4">
-                    <div className="grid grid-cols-10 gap-5 pl-4 pr-5">
-                      <img
-                        className="rounded-md w-20 h-20 object-cover col-span-2"
-                        alt="Midone - HTML Admin Template"
-                        src={pic}
-                      />
-                    </div>
-                    <div className="px-4 pb-4 mt-5 flex items-center justify-center cursor-pointer relative">
-                      <Lucide icon="Image" className="w-4 h-4 mr-2" />
-                      <span className="text-primary mr-1">
-                        Upload a file
-                      </span>{" "}
-                      or drag and drop
-                      <input
-                        id="horizontal-form-1"
-                        type="file"
-                        className="w-full h-full top-0 left-0 absolute opacity-0"
-                        onChange={(e) => {
-                          postDetails(e.target.files[0]);
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* END: Uplaod Product */}
-          {/* BEGIN: Product Information */}
           <div className="intro-y box p-5 mt-5">
             <div className="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
               <div className="font-medium text-base flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5">
@@ -302,11 +257,32 @@ function Main() {
                       <option value="slipers">Slipers</option>
                       <option value="slipers">Slipers</option>
                       <option value="slipers">Slipers</option>
-                      {/* {$_.take($f(), 9).map((faker, fakerKey) => (
-                        <option key={fakerKey} value={faker.categories[0].name}>
-                          {faker.categories[0].name}
-                        </option>
-                      ))} */}
+                    </select>
+                  </div>
+                </div>
+                <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
+                  <div className="form-label xl:w-64 xl:!mr-10">
+                    <div className="text-left">
+                      <div className="flex items-center">
+                        <div className="font-medium">Tag</div>
+                        <div className="ml-2 px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-darkmode-300 dark:text-slate-400 text-xs rounded-md">
+                          Required
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-full mt-3 xl:mt-0 flex-1">
+                    <select
+                      id="tag"
+                      name="tag"
+                      value={product.tag}
+                      onChange={handleChange}
+                      className="form-select"
+                    >
+                      <option value="General">General</option>
+                      <option value="Recommended">Recommended</option>
+                      <option value="Top">Top</option>
+                      <option value="Best Seller">Best Seller</option>
                     </select>
                   </div>
                 </div>
@@ -340,8 +316,7 @@ function Main() {
               </div>
             </div>
           </div>
-          {/* END: Product Information */}
-          {/* BEGIN: Product Detail */}
+
           <div className="intro-y box p-5 mt-5">
             <div className="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
               <div className="font-medium text-base flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5">
@@ -351,48 +326,10 @@ function Main() {
               <div className="mt-5">
                 <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
                   <div className="form-label xl:w-64 xl:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">Condition</div>
-                        <div className="ml-2 px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-darkmode-300 dark:text-slate-400 text-xs rounded-md">
-                          Required
-                        </div>
-                      </div>
-                    </div>
+                    <div className="text-left"></div>
                   </div>
                   <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <div className="flex flex-col sm:flex-row">
-                      <div className="form-check mr-4">
-                        <input
-                          id="condition-new"
-                          className="form-check-input"
-                          type="radio"
-                          name="horizontal_radio_button"
-                          value="horizontal-radio-chris-evans"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="condition-new"
-                        >
-                          New
-                        </label>
-                      </div>
-                      <div className="form-check mr-4 mt-2 sm:mt-0">
-                        <input
-                          id="condition-second"
-                          className="form-check-input"
-                          type="radio"
-                          name="horizontal_radio_button"
-                          value="horizontal-radio-liam-neeson"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="condition-second"
-                        >
-                          Second
-                        </label>
-                      </div>
-                    </div>
+                    <div className="flex flex-col sm:flex-row"></div>
                   </div>
                 </div>
                 <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
@@ -419,7 +356,22 @@ function Main() {
                     </div>
                   </div>
                   <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <textarea
+                    <div class="box border rounded flex flex-col shadow bg-white">
+                      <div class="box__title bg-grey-lighter px-3 py-2 border-b">
+                        <h3 class="text-sm text-grey-darker font-medium">
+                          Product Description
+                        </h3>
+                      </div>
+                      <textarea
+                        name="desc"
+                        value={product.desc}
+                        onChange={handleChange}
+                        placeholder="Product Description"
+                        cols={30}
+                        rows={10}
+                      ></textarea>
+                    </div>
+                    {/* <textarea
                       name="desc"
                       value={product.desc}
                       onChange={handleChange}
@@ -427,14 +379,14 @@ function Main() {
                       rows={5}
                       className="form-textarea"
                       cols={30}
-                    />
+                    /> */}
 
                     <div className="form-help text-right">
                       Maximum character 0/2000
                     </div>
                   </div>
                 </div>
-                <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
+                {/* <div className="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
                   <div className="form-label xl:w-64 xl:!mr-10">
                     <div className="text-left">
                       <div className="flex items-center">
@@ -459,13 +411,13 @@ function Main() {
                       URL
                     </button>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
           {/* END: Product Detail */}
           {/* BEGIN: Product Variant */}
-          <div className="intro-y box p-5 mt-5">
+          {/* <div className="intro-y box p-5 mt-5">
             <div className="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
               <div className="font-medium text-base flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5">
                 <Lucide icon="ChevronDown" className="w-4 h-4 mr-2" /> Product
@@ -493,7 +445,7 @@ function Main() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
           {/* END: Product Variant */}
           {/* BEGIN: Product Variant (Details) */}
           <div className="intro-y box p-5 mt-5">
@@ -503,222 +455,259 @@ function Main() {
                 Variant (Details)
               </div>
               <div className="mt-5">
-                <div className="form-inline items-start flex-col xl:flex-row mt-2 pt-2 first:mt-0 first:pt-0">
-                  <div className="form-label xl:w-64 xl:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">Variant 1</div>
+                {product.variant.map((item, index) => {
+                  return (
+                    <div className="form-inline items-start flex-col xl:flex-row mt-2 pt-2 first:mt-0 first:pt-0">
+                      <div className="form-label xl:w-64 xl:!mr-10">
+                        <div className="text-left">
+                          <div className="flex items-center">
+                            <div className="font-medium">
+                              Variant {index + 1}
+                            </div>
+                          </div>
+                          <div className="leading-relaxed text-slate-500 text-xs mt-3">
+                            Add the types of variants and options, you can add
+                            up to 5 options.
+                          </div>
+                        </div>
                       </div>
-                      <div className="leading-relaxed text-slate-500 text-xs mt-3">
-                        Add the types of variants and options, you can add up to
-                        5 options.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <div className="relative pl-5 pr-5 xl:pr-10 py-10 bg-slate-50 dark:bg-transparent dark:border rounded-md">
-                      <a
-                        href=""
-                        className="text-slate-500 absolute top-0 right-0 mr-4 mt-4"
-                      >
-                        <Lucide icon="X" className="w-5 h-5" />
-                      </a>
-                      <div>
-                        <div className="form-inline mt-5 first:mt-0">
-                          <label className="form-label mt-2 sm:w-20">
-                            Size
-                          </label>
-                          <div className="w-full mt-3 xl:mt-0 flex-1">
-                            <select
-                              id="category"
-                              name="size"
-                              value={product.size}
-                              onChange={handleChange}
-                              className="form-select"
-                            >
-                              <option value="SM">SM</option>
-                              <option value="XL">XL</option>
-                              <option value="XXL">XXl</option>
-                              <option value="LG">LG</option>
+                      <div className="w-full mt-3 xl:mt-0 flex-1">
+                        <div className="relative pl-5 pr-5 xl:pr-10 py-10 bg-slate-50 dark:bg-transparent dark:border rounded-md">
+                          <button
+                            className="text-slate-500 absolute top-0 right-0 mr-4 mt-4"
+                            onClick={() => {
+                              removeVariant(index);
+                            }}
+                          >
+                            <Lucide icon="X" className="w-5 h-5" />
+                          </button>
 
-                              {/* {$_.take($f(), 9).map((faker, fakerKey) => (
-                        <option key={fakerKey} value={faker.categories[0].name}>
-                          {faker.categories[0].name}
-                        </option>
-                      ))} */}
-                            </select>
-                          </div>
-                        </div>
-                        <div className="form-inline mt-5 items-start first:mt-0">
-                          <label className="form-label mt-2 sm:w-20">
-                            slug
-                          </label>
-                          <div className="flex-1">
-                            <div className="xl:flex items-center mt-5 first:mt-0">
-                              <div className="input-group flex-1">
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="slug"
-                                  onChange={handleChange}
-                                  name="slug"
-                                  value={product.slug}
-                                />
-                                <div className="input-group-text">6/14</div>
+                          <div>
+                            <div className="form-inline mt-5 items-start first:mt-0">
+                              <label className="form-label mt-2 sm:w-20">
+                                Image
+                              </label>
+                              <div className="w-full mt-3 xl:mt-0 flex-1 border-2 border-dashed dark:border-darkmode-400 rounded-md pt-4">
+                                <div className="grid grid-cols-10 gap-5 pl-4 pr-5">
+                                  {allPic.length > 0 &&
+                                    allPic.map((pic, index) => {
+                                      return (
+                                        <img
+                                          key={index}
+                                          className="rounded-md w-20 h-20 object-cover col-span-2"
+                                          alt="Midone - HTML Admin Template"
+                                          src={pic}
+                                        />
+                                      );
+                                    })}
+                                </div>
+                                <div className="px-4 pb-4 mt-5 flex items-center justify-center cursor-pointer relative">
+                                  <Lucide
+                                    icon="Image"
+                                    className="w-4 h-4 mr-2"
+                                  />
+                                  <span className="text-primary mr-1">
+                                    Upload a file
+                                  </span>{" "}
+                                  or drag and drop
+                                  <input
+                                    id="horizontal-form-1"
+                                    type="file"
+                                    className="w-full h-full top-0 left-0 absolute opacity-0"
+                                    onChange={(e) => {
+                                      postDetails(e.target.files[0]);
+                                    }}
+                                  />
+                                </div>
                               </div>
                             </div>
+                            <div className="form-inline mt-5 first:mt-0">
+                              <label className="form-label mt-2 sm:w-20">
+                                Size
+                              </label>
+                              <div className="space-x-2">
+                                {item.size.map((size, spanIndex) => {
+                                  return (
+                                    <span
+                                      className="py-3 px-4 cursor-pointer bg-gray-400 rounded-sm relative group"
+                                      id={index}
+                                    >
+                                      <span
+                                        className="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl group-hover:block group-hover:bg-gray-200  px-4 "
+                                        onClick={(e) => {
+                                          // setSizes(sizes.filter((item, i) => i !== index))
+                                          removeCSizes(index, spanIndex);
+                                          // setSizes(
+                                          //   item.size.filter(
+                                          //     (s, i) => i !== index
+                                          //   )
+                                          // );
+                                        }}
+                                      >
+                                        x
+                                      </span>
+                                      {size}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                              <div className="w-full mt-3 xl:mt-0 flex-1 ml-2">
+                                <select
+                                  id="category"
+                                  name="size"
+                                  value={sizes}
+                                  onChange={(e) => {
+                                    setSizes(e.target.value);
+                                    if (item.size.includes(e.target.value)) {
+                                      toast.warn(
+                                        `${e.target.value} already in variant ${
+                                          index + 1
+                                        }`,
+                                        {
+                                          position: "bottom-center",
+                                          autoClose: 5000,
+                                          hideProgressBar: false,
+                                          closeOnClick: true,
+                                          pauseOnHover: true,
+                                          draggable: true,
+                                          progress: undefined,
+                                        }
+                                      );
+                                      return;
+                                    }
+
+                                    //  sizes.find((item) => item === e.target.value)
+                                    // setSizes([...sizes, e.target.value]);
+                                    addCSizes(e, index);
+                                  }}
+                                  className="form-select"
+                                >
+                                  <option value={10}>10</option>
+                                  <option value={20}>20</option>
+                                  <option value={30}>30</option>
+                                  <option value={40}>40</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div className="form-inline mt-5 items-start first:mt-0">
+                              <label className="form-label mt-2 sm:w-20">
+                                Custom Size
+                              </label>
+                              <div className="flex-1">
+                                <div className="xl:flex items-center mt-5 first:mt-0">
+                                  <div className="input-group flex-1">
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      name="size"
+                                      placeholder="Add your custom size"
+                                      onChange={(e) => {
+                                        setCustomSize(e.target.value);
+                                      }}
+                                      value={customSize}
+                                    />
+                                  </div>
+                                  <button
+                                    onClick={() => {
+                                      addCSizes(customSize, index);
+                                    }}
+                                  >
+                                    Add
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="form-inline mt-5 items-start first:mt-0">
+                              <label className="form-label mt-2 sm:w-20">
+                                Slug
+                              </label>
+                              <div className="flex-1">
+                                <div className="xl:flex items-center mt-5 first:mt-0">
+                                  <div className="input-group flex-1">
+                                    <input
+                                      type="text"
+                                      className="form-control"
+                                      placeholder="url like this: /product/your-slug"
+                                      onChange={(e) => {
+                                        handleBranchChange(e, index);
+                                      }}
+                                      name="slug"
+                                      value={item.slug}
+                                    />
+                                    <div className="input-group-text">6/14</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="form-inline mt-5 items-start first:mt-0">
+                              <label className="form-label mt-2 sm:w-20">
+                                Color
+                              </label>
+                              <div className="w-full mt-3 xl:mt-0 flex-1">
+                                <input
+                                  type="text"
+                                  className="form-control capitalize"
+                                  placeholder="color"
+                                  onChange={(e) => {
+                                    handleBranchChange(e, index);
+                                  }}
+                                  name="color"
+                                  value={item.color}
+                                />
+                              </div>
+                            </div>
+                            <div className="form-inline mt-5 items-start first:mt-0">
+                              <label className="form-label mt-2 sm:w-20">
+                                Price
+                              </label>
+                              <div className="w-full mt-3 xl:mt-0 flex-1">
+                                <input
+                                  type="number"
+                                  className="form-control capitalize"
+                                  placeholder="Price"
+                                  onChange={(e) => {
+                                    handleBranchChange(e, index);
+                                  }}
+                                  name="price"
+                                  value={item.price}
+                                />
+                              </div>
+                            </div>
+                            <div className="form-inline mt-5 items-start first:mt-0">
+                              <label className="form-label mt-2 sm:w-20">
+                                Stock
+                              </label>
+                              <div className="w-full mt-3 xl:mt-0 flex-1">
+                                <input
+                                  type="number"
+                                  className="form-control capitalize"
+                                  placeholder="Stock"
+                                  onChange={(e) => {
+                                    handleBranchChange(e, index);
+                                  }}
+                                  name="availableQty"
+                                  value={item.availableQty}
+                                />
+                              </div>
+                            </div>
+                            <div className="xl:ml-20 xl:pl-5 xl:pr-20 mt-5 first:mt-0">
+                              <button className="btn btn-outline-primary border-dashed w-full">
+                                <Lucide icon="Plus" className="w-4 h-4 mr-2" />{" "}
+                                Add New Option
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                        <div className="form-inline mt-5 items-start first:mt-0">
-                          <label className="form-label mt-2 sm:w-20">
-                            color
-                          </label>
-                          <div className="w-full mt-3 xl:mt-0 flex-1">
-                            <input
-                              type="text"
-                              className="form-control capitalize"
-                              placeholder="color"
-                              onChange={handleChange}
-                              name="color"
-                              value={product.color}
-                            />
-                            {/* <select
-                              id="category"
-                              name="category"
-                              value={product.category}
-                              onChange={handleChange}
-                              className="form-select"
-                            >
-                              <option value="slipers">Slipers</option>
-                              <option value="slipers">Slipers</option>
-                              <option value="slipers">Slipers</option>
-                              <option value="slipers">Slipers</option>
-                              <option value="slipers">Slipers</option>
-                              {/* {$_.take($f(), 9).map((faker, fakerKey) => (
-                        <option key={fakerKey} value={faker.categories[0].name}>
-                          {faker.categories[0].name}
-                        </option>
-                      ))} */}
-                            {/* </select> */}
-                          </div>
-                        </div>
-                        <div className="xl:ml-20 xl:pl-5 xl:pr-20 mt-5 first:mt-0">
-                          <button className="btn btn-outline-primary border-dashed w-full">
-                            <Lucide icon="Plus" className="w-4 h-4 mr-2" /> Add
-                            New Option
-                          </button>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-                <div className="form-inline items-start flex-col xl:flex-row mt-2 pt-2 first:mt-0 first:pt-0">
-                  <div className="form-label xl:w-64 xl:!mr-10">
-                    <div className="text-left">
-                      <div className="flex items-center">
-                        <div className="font-medium">Variant 2</div>
-                      </div>
-                      <div className="leading-relaxed text-slate-500 text-xs mt-3">
-                        Add the types of variants and options, you can add up to
-                        5 options.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full mt-3 xl:mt-0 flex-1">
-                    <div className="relative pl-5 pr-5 xl:pr-10 py-10 bg-slate-50 dark:bg-transparent dark:border rounded-md">
-                      <a
-                        href=""
-                        className="text-slate-500 absolute top-0 right-0 mr-4 mt-4"
-                      >
-                        <Lucide icon="X" className="w-5 h-5" />
-                      </a>
-                      <div>
-                        <div className="form-inline mt-5 first:mt-0">
-                          <label className="form-label sm:w-20">Name</label>
-                          <div className="flex items-center flex-1 xl:pr-20">
-                            <div className="input-group flex-1">
-                              <input
-                                type="text"
-                                className="form-control"
-                                placeholder="Color"
-                              />
-                              <div className="input-group-text">6/14</div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="form-inline mt-5 items-start first:mt-0">
-                          <label className="form-label mt-2 sm:w-20">
-                            Options
-                          </label>
-                          <div className="flex-1">
-                            <div className="xl:flex items-center mt-5 first:mt-0">
-                              <div className="input-group flex-1">
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Black"
-                                />
-                                <div className="input-group-text">6/14</div>
-                              </div>
-                              <div className="w-20 flex text-slate-500 mt-3 xl:mt-0">
-                                <a href="" className="xl:ml-5">
-                                  <Lucide icon="Move" className="w-4 h-4" />
-                                </a>
-                                <a href="" className="ml-3 xl:ml-5">
-                                  <Lucide icon="Trash2" className="w-4 h-4" />
-                                </a>
-                              </div>
-                            </div>
-                            <div className="xl:flex items-center mt-5 first:mt-0">
-                              <div className="input-group flex-1">
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="White"
-                                />
-                                <div className="input-group-text">6/14</div>
-                              </div>
-                              <div className="w-20 flex text-slate-500 mt-3 xl:mt-0">
-                                <a href="" className="xl:ml-5">
-                                  <Lucide icon="Move" className="w-4 h-4" />
-                                </a>
-                                <a href="" className="ml-3 xl:ml-5">
-                                  <Lucide icon="Trash2" className="w-4 h-4" />
-                                </a>
-                              </div>
-                            </div>
-                            <div className="xl:flex items-center mt-5 first:mt-0">
-                              <div className="input-group flex-1">
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Gray"
-                                />
-                                <div className="input-group-text">6/14</div>
-                              </div>
-                              <div className="w-20 flex text-slate-500 mt-3 xl:mt-0">
-                                <a href="" className="xl:ml-5">
-                                  <Lucide icon="Move" className="w-4 h-4" />
-                                </a>
-                                <a href="" className="ml-3 xl:ml-5">
-                                  <Lucide icon="Trash2" className="w-4 h-4" />
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="xl:ml-20 xl:pl-5 xl:pr-20 mt-5 first:mt-0">
-                          <button className="btn btn-outline-primary border-dashed w-full">
-                            <Lucide icon="Plus" className="w-4 h-4 mr-2" /> Add
-                            New Option
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
+
                 <div className="xl:ml-64 xl:pl-10 mt-2 pt-2 first:mt-0 first:pt-0">
-                  <button className="btn py-3 btn-outline-secondary border-dashed w-full">
+                  <button
+                    className="btn py-3 btn-outline-secondary border-dashed w-full"
+                    onClick={addNewVariant}
+                  >
                     <Lucide icon="Plus" className="w-4 h-4 mr-2" /> Add New
                     Variant
                   </button>
