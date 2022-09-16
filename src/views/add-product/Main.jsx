@@ -139,7 +139,7 @@ function Main() {
       progress: undefined,
     });
 
-    const respData = await fetch("http://localhost:3001/api/product", {
+    const respData = await fetch("https://incascestor.vercel.app/api/product", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
