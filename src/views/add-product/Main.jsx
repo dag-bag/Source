@@ -129,10 +129,7 @@ function Main() {
 
   const [sizes, setSizes] = useState(10);
 
-  const handleSubimt = async (e) => {
-    // console.log({ pic });
-    console.log(product);
-
+  const handleSubimt = async (e, type) => {
     const id = toast.loading("Creating please wait!", {
       position: "bottom-center",
       autoClose: 5000,
@@ -155,21 +152,9 @@ function Main() {
     console.log(success, msg, error);
     if (success) {
       toast.update(id, { render: msg, type: "success", isLoading: false });
-      let ImpData = {
-        slugToValidate: "/alpaca-toys",
-        secret: "vir",
-      };
-
-      const respData = await fetch(
-        "https://incascestor.vercel.app/api/revalidate",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(ImpData),
-        }
-      );
+      if (type === "publish") {
+        await newFunction();
+      }
     }
 
     if (error) {
@@ -991,6 +976,9 @@ function Main() {
             <button
               type="button"
               className="btn py-3 border-slate-300 dark:border-darkmode-400 text-slate-500 w-full md:w-52"
+              onClick={(e) => {
+                handleSubimt(e, "publish");
+              }}
             >
               Save & Add New Product
             </button>
@@ -1055,6 +1043,38 @@ function Main() {
       </div>
     </>
   );
+
+  async function newFunction() {
+    let ImpData = {
+      slugToValidate: "/alpaca-toys",
+      secret: "vir",
+      slugs: ["/alpaca-toys", "/"],
+    };
+    const revlidate = toast.loading("Publishing please wait!", {
+      position: "bottom-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+    const respData = await fetch(
+      "https://incascestor.vercel.app/api/revalidate",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(ImpData),
+      }
+    );
+    toast.update(revlidate, {
+      render: "Published Successfully",
+      type: "success",
+      isLoading: false,
+    });
+  }
 }
 
 export default Main;
