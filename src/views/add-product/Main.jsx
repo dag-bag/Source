@@ -46,16 +46,6 @@ function Main() {
     console.log("Data", data);
   };
 
-  // const respData = await fetch("http://localhost:3000/api/products", {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify({
-  //     ...product,
-  //   }),
-  // });
-
   const [active, setActive] = useState(false);
   const addNewVariant = () => {
     let a = {
@@ -82,8 +72,17 @@ function Main() {
     desc: "",
     category: "slipers",
     variant: [
-      { img: [], color: "", size: [10], price: 0, slug: "", availableQty: 0 },
+      {
+        img: [],
+        color: "",
+        size: [10],
+        price: 0,
+        sellPrice: 0,
+        slug: "",
+        availableQty: 0,
+      },
     ],
+
     tag: "General",
   });
   let url = product.title.replace(/\s+/g, "-").toLowerCase();
@@ -140,7 +139,7 @@ function Main() {
       progress: undefined,
     });
 
-    const respData = await fetch("https://incascestor.vercel.app/api/product", {
+    const respData = await fetch("http://localhost:3001/api/product", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -643,8 +642,8 @@ function Main() {
                               </div>
                             </div>
                             <div className="form-inline mt-5 items-start first:mt-0">
-                              <label className="form-label mt-2 sm:w-20">
-                                Price
+                              <label className="form-label mt-2 sm:w-20 text-center">
+                                Normal Price
                               </label>
                               <div className="w-full mt-3 xl:mt-0 flex-1">
                                 <input
@@ -656,6 +655,21 @@ function Main() {
                                   }}
                                   name="price"
                                   value={item.price}
+                                />
+                              </div>
+                              <label className="form-label mt-2 sm:w-20">
+                                Sell Price
+                              </label>
+                              <div className="w-full mt-3 xl:mt-0 flex-1">
+                                <input
+                                  type="number"
+                                  className="form-control capitalize"
+                                  placeholder="Price"
+                                  onChange={(e) => {
+                                    handleBranchChange(e, index);
+                                  }}
+                                  name="sellPrice"
+                                  value={item.sellPrice}
                                 />
                               </div>
                             </div>
@@ -977,6 +991,7 @@ function Main() {
               type="button"
               className="btn py-3 border-slate-300 dark:border-darkmode-400 text-slate-500 w-full md:w-52"
               onClick={(e) => {
+                product.active = true;
                 handleSubimt(e, "publish");
               }}
             >
