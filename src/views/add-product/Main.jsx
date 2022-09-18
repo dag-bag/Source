@@ -13,6 +13,7 @@ import {
 import { useState } from "react";
 import { atom, selector, useRecoilValue } from "recoil";
 import { size } from "lodash";
+import { string } from "yup";
 
 function Main() {
   const [pic, setPic] = useState("");
@@ -48,16 +49,17 @@ function Main() {
 
   const [active, setActive] = useState(false);
   const addNewVariant = () => {
-    let a = {
+    let variant = {
       img: [],
       color: "",
-      size: [],
+      size: [10],
       price: 0,
+      sellPrice: 0,
       slug: "",
       availableQty: 0,
     };
     let temp = { ...product };
-    temp.variant = [...temp.variant, a];
+    temp.variant = [...temp.variant, variant];
     setProduct(temp);
   };
   const removeVariant = (i) => {
@@ -100,12 +102,21 @@ function Main() {
 
   const addCSizes = (e, i) => {
     let temp = { ...product };
+    if (e === "") {
+      toast.error("Please enter a size");
+      return null;
+    }
+
     let size = parseInt(e);
 
     temp.variant[i].size = [...temp.variant[i].size, size];
     setProduct(temp);
   };
   const addImages = (i, img) => {
+    if (img === "") {
+      toast.error("Please select a image");
+      return null;
+    }
     let temp = { ...product };
     temp.variant[i].img = [...temp.variant[i].img, img];
     setProduct(temp);
@@ -720,7 +731,7 @@ function Main() {
 
           {/* END: Product Management */}
           {/* BEGIN: Weight & Shipping */}
-          <div className="intro-y box p-5 mt-5">
+          {/* <div className="intro-y box p-5 mt-5">
             <div className="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
               <div className="font-medium text-base flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5">
                 <Lucide icon="ChevronDown" className="w-4 h-4 mr-2" /> Weight &
@@ -978,7 +989,7 @@ function Main() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
           {/* END: Weight & Shipping */}
           <div className="flex justify-end flex-col md:flex-row gap-2 mt-5">
             <button

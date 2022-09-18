@@ -44,14 +44,20 @@ function SubProductList() {
               <td className="w-40">
                 <div className="flex">
                   <div className="w-10 h-10 image-fit zoom-in">
-                    {products?.variant?.map((i) => {
-                      <Tippy
-                        tag="img"
-                        alt="Midone Tailwind HTML Admin Template"
-                        className="rounded-full"
-                        src={i.img}
-                        content={`Uploaded at faker.dates}`}
-                      />;
+                    {faker?.variant.map((i) => {
+                      return i.img.map((i) => {
+                        return (
+                          <>
+                            <Tippy
+                              tag="img"
+                              alt="Midone Tailwind HTML Admin Template"
+                              className="rounded-full"
+                              src={i}
+                              content={`Uploaded at faker.dates}`}
+                            />
+                          </>
+                        );
+                      });
                     })}
                   </div>
                 </div>
@@ -63,14 +69,26 @@ function SubProductList() {
                 <div className="text-slate-500 text-xs whitespace-nowrap mt-0.5">
                   {faker.category}
                 </div>
-                <div>
-                  {/* {products.map((i) => {
-                    return <h1>{i.slug}</h1>;
-                  })} */}
-                </div>
+
+                {faker.variant.map((item, i) => {
+                  console.log("item:", item);
+                  return (
+                    <div>
+                      <h1>Variant {i + 1}</h1>
+                    </div>
+                  );
+                })}
               </td>
-              <td className="text-center">{0}</td>
-              <td className="text-center">${faker.price}</td>
+              {faker.variant.map((item, i) => {
+                console.log("item:", item);
+                return (
+                  <>
+                    <td className="text-center">{item.price}</td>
+                    <td className="text-center">${item.price}</td>
+                  </>
+                );
+              })}
+
               <td className="w-40">
                 <div
                   className={classnames({
