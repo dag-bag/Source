@@ -85,7 +85,7 @@ function Main() {
     category: "slipers",
     variant: [
       {
-        img: ["/src/assets/images/profile-7.jpg"],
+        img: [],
         color: "",
         size: [10],
         price: 0,
