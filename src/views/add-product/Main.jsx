@@ -14,8 +14,11 @@ import { useState } from "react";
 import { atom, selector, useRecoilValue } from "recoil";
 import { size } from "lodash";
 import { string } from "yup";
+import { URLATOM } from "../../stores/products-data";
+import { number } from "prop-types";
 
 function Main() {
+  const URL = useRecoilValue(URLATOM);
   const [pic, setPic] = useState("");
   const [allPic, setAllPic] = useState([]);
   console.log(allPic);
@@ -75,7 +78,7 @@ function Main() {
     category: "slipers",
     variant: [
       {
-        img: [],
+        img: ["/src/assets/images/profile-7.jpg"],
         color: "",
         size: [10],
         price: 0,
@@ -108,6 +111,10 @@ function Main() {
     }
 
     let size = parseInt(e);
+    if (isNaN(size)) {
+      toast.error("Please enter a valid size");
+      return null;
+    }
 
     temp.variant[i].size = [...temp.variant[i].size, size];
     setProduct(temp);
@@ -150,7 +157,7 @@ function Main() {
       progress: undefined,
     });
 
-    const respData = await fetch("https://incascestor.vercel.app/api/product", {
+    const respData = await fetch(`${URL}/api/product`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1085,16 +1092,13 @@ function Main() {
       draggable: true,
       progress: undefined,
     });
-    const respData = await fetch(
-      "https://incascestor.vercel.app/api/revalidate",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(ImpData),
-      }
-    );
+    const respData = await fetch(`${URL}/api/revalidate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ImpData),
+    });
     toast.update(revlidate, {
       render: "Published Successfully",
       type: "success",

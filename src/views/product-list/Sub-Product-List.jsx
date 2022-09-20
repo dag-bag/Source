@@ -2,8 +2,13 @@
 
 import * as $_ from "lodash";
 import React, { useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { productsDataAtom } from "../../stores/products-data";
+import {
+  atom,
+  useRecoilState,
+  useRecoilValue,
+  useSetRecoilState,
+} from "recoil";
+import { deleteState, productsDataAtom } from "../../stores/products-data";
 import {
   Lucide,
   Tippy,
@@ -22,7 +27,9 @@ function SubProductList() {
   const setDeleteProductId = useSetRecoilState(deleteProductIdAtom);
 
   const products = useRecoilValue(productsDataAtom);
+  const [deleteSta, setDeleteState] = useRecoilState(deleteState);
   console.log("products:", products);
+  console.log("deleteState:", deleteSta);
 
   return (
     <div className="intro-y col-span-12 overflow-auto lg:overflow-visible ">
@@ -31,6 +38,7 @@ function SubProductList() {
           <tr>
             <th className="whitespace-nowrap">IMAGES</th>
             <th className="whitespace-nowrap">PRODUCT NAME</th>
+            <th className="whitespace-nowrap">Variant NAME</th>
 
             <th className="text-center whitespace-nowrap">STOCK</th>
             <th className="text-center whitespace-nowrap">PRICE</th>
@@ -69,7 +77,8 @@ function SubProductList() {
                 <div className="text-slate-500 text-xs whitespace-nowrap mt-0.5">
                   {faker.category}
                 </div>
-
+              </td>
+              <td>
                 {faker.variant.map((item, i) => {
                   console.log("item:", item);
                   return (
@@ -79,15 +88,24 @@ function SubProductList() {
                   );
                 })}
               </td>
-              {faker.variant.map((item, i) => {
-                console.log("item:", item);
-                return (
-                  <>
-                    <td className="text-center">{item.price}</td>
-                    <td className="text-center">${item.price}</td>
-                  </>
-                );
-              })}
+              <td>
+                {faker.variant.map((item, i) => {
+                  return (
+                    <div>
+                      <h1>{item.availableQty}</h1>
+                    </div>
+                  );
+                })}
+              </td>
+              <td className="mt-4">
+                {faker.variant.map((item, i) => {
+                  return (
+                    <div className="">
+                      <h1>{item.price}</h1>
+                    </div>
+                  );
+                })}
+              </td>
 
               <td className="w-40">
                 <div
@@ -98,24 +116,28 @@ function SubProductList() {
                   })}
                 >
                   <Lucide icon="CheckSquare" className="w-4 h-4 mr-2" />
-                  {/* {faker.trueFalse[0] ? "Active" : "Inactive"} */}
+
+                  {faker.active ? "Active" : "Inactive"}
                 </div>
               </td>
               <td className="table-report__action w-56">
                 <div className="flex justify-center items-center">
-                  <a className="flex items-center mr-3" href="#">
+                  <button
+                    className="flex items-center mr-3"
+                    onClick={setDeleteState(!deleteState)}
+                  >
                     <Lucide icon="CheckSquare" className="w-4 h-4 mr-1" /> Edit
-                  </a>
-                  <a
+                  </button>
+                  <button
                     className="flex items-center text-danger"
-                    href="#"
                     onClick={() => {
                       setDeleteConfirmationModal(true);
+
                       setDeleteProductId(faker._id);
                     }}
                   >
                     <Lucide icon="Trash2" className="w-4 h-4 mr-1" /> Delete
-                  </a>
+                  </button>
                 </div>
               </td>
             </tr>

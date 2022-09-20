@@ -14,14 +14,15 @@ import {
 import { faker as $f } from "@/utils";
 import * as $_ from "lodash";
 import classnames from "classnames";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import {
   atom,
   useRecoilSnapshot,
   useRecoilState,
   useRecoilValue,
+  useSetRecoilState,
 } from "recoil";
-import { productsDataAtom } from "../../stores/products-data";
+import { deleteState, productsDataAtom } from "../../stores/products-data";
 import SubProductList from "./Sub-Product-List";
 export const deleteConfirmationAtom = atom({
   key: "deleteConfirmationAtom",
@@ -32,17 +33,21 @@ export const deleteProductIdAtom = atom({
   default: null,
 });
 function Main() {
+  const setDeleteState = useSetRecoilState(deleteState);
   const [deleteConfirmationModal, setDeleteConfirmationModal] = useRecoilState(
     deleteConfirmationAtom
   );
   const deletedId = useRecoilValue(deleteProductIdAtom);
   const DeleteProduct = async () => {
     const deleteProduct = await fetch(
-      `https://fakestoreapi.com/products/${deletedId}`,
+      `http://localhost:3001/api/product?id=${deletedId}`,
+
       {
         method: "DELETE",
       }
     );
+    const deleteProductJson = await deleteProduct.json();
+    console.log("deleteProductJson:", deleteProductJson);
     setDeleteConfirmationModal(false);
   };
   // const products = useRecoilValue(productsDataAtom);
@@ -165,6 +170,7 @@ function Main() {
       <Modal
         show={deleteConfirmationModal}
         onHidden={() => {
+          setDeleteState(true);
           setDeleteConfirmationModal(false);
         }}
       >
