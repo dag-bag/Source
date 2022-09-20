@@ -21,7 +21,14 @@ export const deleteState = atom({
   default: false,
 });
 
+let Live = "https://incascestor.vercel.app";
+let Local = "http://localhost:3001";
 export const URLATOM = atom({
   key: "apiUrl",
-  default: "http://localhost:3001",
+  default: Live,
+});
+
+export const EditableProduct = atom({
+  key: "EditableProduct",
+  default: {},
 });

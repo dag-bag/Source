@@ -1,3 +1,5 @@
+/** @format */
+
 import { useRoutes } from "react-router-dom";
 import SideMenu from "../layouts/side-menu/Main";
 import SimpleMenu from "../layouts/simple-menu/Main";
@@ -8,6 +10,7 @@ import DashboardOverview3 from "../views/dashboard-overview-3/Main";
 import DashboardOverview4 from "../views/dashboard-overview-4/Main";
 import Categories from "../views/categories/Main";
 import AddProduct from "../views/add-product/Main";
+import EditProduct from "../views/edit-product/Main";
 import ProductList from "../views/product-list/Main";
 import ProductGrid from "../views/product-grid/Main";
 import TransactionList from "../views/transaction-list/Main";
@@ -101,6 +104,10 @@ function Router() {
         {
           path: "add-product",
           element: <AddProduct />,
+        },
+        {
+          path: "edit-product/:id",
+          element: <EditProduct />,
         },
         {
           path: "product-list",
@@ -373,6 +380,10 @@ function Router() {
           element: <AddProduct />,
         },
         {
+          path: "edit-product/:id",
+          element: <EditProduct />,
+        },
+        {
           path: "product-list",
           element: <ProductList />,
         },
@@ -641,6 +652,10 @@ function Router() {
         {
           path: "add-product",
           element: <AddProduct />,
+        },
+        {
+          path: "edit-product/:id",
+          element: <EditProduct />,
         },
         {
           path: "product-list",

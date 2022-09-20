@@ -14,22 +14,35 @@ import { useState } from "react";
 import {
   atom,
   selector,
-  useRecoilSnapshot,
   useRecoilState,
   useRecoilValue,
+  useSetRecoilState,
 } from "recoil";
 import { size } from "lodash";
 import { string } from "yup";
-import { deleteState, URLATOM } from "../../stores/products-data";
+import {
+  deleteState,
+  EditableProduct,
+  URLATOM,
+} from "../../stores/products-data";
 import { number } from "prop-types";
 
 function Main() {
+  const editAbleProduct = useRecoilValue(EditableProduct);
+  const {
+    _id,
+    title,
+    desc,
+
+    variant,
+    category,
+    tag,
+  } = editAbleProduct;
+
   const URL = useRecoilValue(URLATOM);
-  const [ChangeState, setChangeState] = useRecoilState(deleteState);
   const [pic, setPic] = useState("");
   const [allPic, setAllPic] = useState([]);
-  console.log(allPic);
-
+  const [ChangeState, setDeleteState] = useRecoilState(deleteState);
   const postDetails = (pic, index) => {
     if (!pic) {
       toast.error("Please select a profile picture");
@@ -80,23 +93,35 @@ function Main() {
   };
 
   const [product, setProduct] = useState({
-    title: "",
-    desc: "",
-    category: "slipers",
-    variant: [
-      {
-        img: ["/src/assets/images/profile-7.jpg"],
-        color: "",
-        size: [10],
-        price: 0,
-        sellPrice: 0,
-        slug: "",
-        availableQty: 0,
-      },
-    ],
+    id: _id,
+    title,
+    desc,
+    category,
+    variant: variant.map((v) => {
+      return {
+        img: v.img,
+        color: v.color,
+        size: v.size,
+        price: v.price,
+        sellPrice: v.sellPrice,
+        slug: v.slug,
+        availableQty: v.availableQty,
+      };
+    }),
 
-    tag: "General",
+    tag,
   });
+  let a = [
+    {
+      img: ["/src/assets/images/profile-7.jpg"],
+      color: "",
+      size: [10],
+      price: 0,
+      sellPrice: 0,
+      slug: "",
+      availableQty: 0,
+    },
+  ];
   let url = product.title.replace(/\s+/g, "-").toLowerCase();
   const slugCreater = (i) => {
     let temp = { ...product };
@@ -154,7 +179,7 @@ function Main() {
   const [sizes, setSizes] = useState(10);
 
   const handleSubimt = async (e, type) => {
-    const id = toast.loading("Creating please wait!", {
+    const id = toast.loading("Updating please wait!", {
       position: "bottom-center",
       autoClose: 5000,
       hideProgressBar: false,
@@ -165,7 +190,7 @@ function Main() {
     });
 
     const respData = await fetch(`${URL}/api/product`, {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -175,8 +200,12 @@ function Main() {
     const { success, msg, error } = resp;
     console.log(success, msg, error);
     if (success) {
-      setChangeState(!ChangeState);
-      toast.update(id, { render: msg, type: "success", isLoading: false });
+      setDeleteState(!ChangeState);
+      toast.update(id, {
+        render: "Product updated Successfully",
+        type: "success",
+        isLoading: false,
+      });
       if (type === "publish") {
         await newFunction();
       }

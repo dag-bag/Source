@@ -8,7 +8,11 @@ import {
   useRecoilValue,
   useSetRecoilState,
 } from "recoil";
-import { deleteState, productsDataAtom } from "../../stores/products-data";
+import {
+  deleteState,
+  EditableProduct,
+  productsDataAtom,
+} from "../../stores/products-data";
 import {
   Lucide,
   Tippy,
@@ -22,7 +26,10 @@ import {
 } from "@/base-components";
 import classnames from "classnames";
 import { deleteConfirmationAtom, deleteProductIdAtom } from "./Main";
+import { useNavigate } from "react-router-dom";
 function SubProductList() {
+  const navigate = useNavigate();
+  const setEditProduct = useSetRecoilState(EditableProduct);
   const setDeleteConfirmationModal = useSetRecoilState(deleteConfirmationAtom);
   const setDeleteProductId = useSetRecoilState(deleteProductIdAtom);
 
@@ -124,7 +131,10 @@ function SubProductList() {
                 <div className="flex justify-center items-center">
                   <button
                     className="flex items-center mr-3"
-                    onClick={setDeleteState(!deleteState)}
+                    onClick={() => {
+                      setEditProduct(faker);
+                      navigate(`/edit-product/${faker._id}`);
+                    }}
                   >
                     <Lucide icon="CheckSquare" className="w-4 h-4 mr-1" /> Edit
                   </button>
