@@ -11,6 +11,7 @@ import {
   Modal,
   ModalBody,
 } from "@/base-components";
+import { ToastContainer, toast } from "react-toastify";
 import { faker as $f } from "@/utils";
 import * as $_ from "lodash";
 import classnames from "classnames";
@@ -22,8 +23,13 @@ import {
   useRecoilValue,
   useSetRecoilState,
 } from "recoil";
-import { deleteState, productsDataAtom } from "../../stores/products-data";
+import {
+  deleteState,
+  productsDataAtom,
+  URLATOM,
+} from "../../stores/products-data";
 import SubProductList from "./Sub-Product-List";
+
 export const deleteConfirmationAtom = atom({
   key: "deleteConfirmationAtom",
   default: false,
@@ -34,20 +40,51 @@ export const deleteProductIdAtom = atom({
 });
 function Main() {
   const setDeleteState = useSetRecoilState(deleteState);
+  const HOST = useRecoilValue(URLATOM);
   const [deleteConfirmationModal, setDeleteConfirmationModal] = useRecoilState(
     deleteConfirmationAtom
   );
   const deletedId = useRecoilValue(deleteProductIdAtom);
   const DeleteProduct = async () => {
     const deleteProduct = await fetch(
-      `http://localhost:3001/api/product?id=${deletedId}`,
+      `${HOST}/api/product?id=${deletedId}`,
 
       {
         method: "DELETE",
       }
     );
     const deleteProductJson = await deleteProduct.json();
-    console.log("deleteProductJson:", deleteProductJson);
+    if (deleteProductJson.success) {
+      async function Revalidate() {
+        let ImpData = {
+          slugToValidate: "/alpaca-toys",
+          secret: "vir",
+          slugs: ["/alpaca-toys", "/"],
+        };
+        const revlidate = toast.loading("Deleting please wait!", {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        const respData = await fetch(`${HOST}/api/revalidate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(ImpData),
+        });
+        toast.update(revlidate, {
+          render: "Deleted Successfully",
+          type: "success",
+          isLoading: false,
+        });
+      }
+      Revalidate();
+    }
     setDeleteConfirmationModal(false);
   };
   // const products = useRecoilValue(productsDataAtom);
@@ -55,6 +92,7 @@ function Main() {
 
   return (
     <>
+      <ToastContainer />
       <h2 className="intro-y text-lg font-medium mt-10">Product List</h2>
       <div className="grid grid-cols-12 gap-6 mt-5">
         <div className="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">

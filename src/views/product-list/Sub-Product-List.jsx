@@ -34,9 +34,6 @@ function SubProductList() {
   const setDeleteProductId = useSetRecoilState(deleteProductIdAtom);
 
   const products = useRecoilValue(productsDataAtom);
-  const [deleteSta, setDeleteState] = useRecoilState(deleteState);
-  console.log("products:", products);
-  console.log("deleteState:", deleteSta);
 
   return (
     <div className="intro-y col-span-12 overflow-auto lg:overflow-visible ">
