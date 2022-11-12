@@ -39,7 +39,7 @@ export const deleteProductIdAtom = atom({
   default: null,
 });
 function Main() {
-  const setDeleteState = useSetRecoilState(deleteState);
+  const [changeState, setDeleteState] = useRecoilState(deleteState);
   const HOST = useRecoilValue(URLATOM);
   const [deleteConfirmationModal, setDeleteConfirmationModal] = useRecoilState(
     deleteConfirmationAtom
@@ -55,6 +55,7 @@ function Main() {
     );
     const deleteProductJson = await deleteProduct.json();
     if (deleteProductJson.success) {
+      setDeleteState(!changeState);
       async function Revalidate() {
         let ImpData = {
           slugToValidate: "/alpaca-toys",
@@ -208,7 +209,6 @@ function Main() {
       <Modal
         show={deleteConfirmationModal}
         onHidden={() => {
-          setDeleteState(true);
           setDeleteConfirmationModal(false);
         }}
       >

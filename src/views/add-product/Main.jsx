@@ -11,6 +11,7 @@ import {
 } from "@/base-components";
 
 import { useState } from "react";
+
 import {
   atom,
   selector,
@@ -67,6 +68,8 @@ function Main() {
       sellPrice: 0,
       slug: "",
       availableQty: 0,
+      metadesc: "",
+      title: "",
     };
     let temp = { ...product };
     temp.variant = [...temp.variant, variant];
@@ -92,6 +95,8 @@ function Main() {
         sellPrice: 0,
         slug: "",
         availableQty: 0,
+        metadesc: "",
+        title: "",
       },
     ],
 
@@ -713,6 +718,40 @@ function Main() {
                                   }}
                                   name="availableQty"
                                   value={item.availableQty}
+                                />
+                              </div>
+                            </div>
+                            <div className="form-inline mt-5 items-start first:mt-0">
+                              <label className="form-label mt-2 sm:w-20">
+                                Title
+                              </label>
+                              <div className="w-full mt-3 xl:mt-0 flex-1">
+                                <input
+                                  type="text"
+                                  className="form-control capitalize"
+                                  placeholder="color"
+                                  onChange={(e) => {
+                                    handleBranchChange(e, index);
+                                  }}
+                                  name="title"
+                                  value={item.title}
+                                />
+                              </div>
+                            </div>
+                            <div className="form-inline mt-5 items-start first:mt-0">
+                              <label className="form-label mt-2 sm:w-20">
+                                Meta Description
+                              </label>
+                              <div className="w-full mt-3 xl:mt-0 flex-1">
+                                <input
+                                  type="text"
+                                  className="form-control capitalize"
+                                  placeholder="color"
+                                  onChange={(e) => {
+                                    handleBranchChange(e, index);
+                                  }}
+                                  name="metadesc"
+                                  value={item.metadesc}
                                 />
                               </div>
                             </div>
