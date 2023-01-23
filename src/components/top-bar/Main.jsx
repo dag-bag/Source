@@ -1,3 +1,5 @@
+/** @format */
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -15,7 +17,7 @@ import { faker as $f } from "@/utils";
 import * as $_ from "lodash";
 import classnames from "classnames";
 import PropTypes from "prop-types";
-
+import { useAuth0 } from "@auth0/auth0-react";
 function Main(props) {
   const [searchDropdown, setSearchDropdown] = useState(false);
   const showSearchDropdown = () => {
@@ -24,7 +26,7 @@ function Main(props) {
   const hideSearchDropdown = () => {
     setSearchDropdown(false);
   };
-
+  const { logout } = useAuth0();
   return (
     <>
       {/* BEGIN: Top Bar */}
@@ -232,7 +234,14 @@ function Main(props) {
                   <Lucide icon="HelpCircle" className="w-4 h-4 mr-2" /> Help
                 </DropdownItem>
                 <DropdownDivider className="border-white/[0.08]" />
-                <DropdownItem className="hover:bg-white/5">
+                <DropdownItem
+                  className="hover:bg-white/5"
+                  onClick={() =>
+                    logout({
+                      logoutParams: { returnTo: window.location.origin },
+                    })
+                  }
+                >
                   <Lucide icon="ToggleRight" className="w-4 h-4 mr-2" /> Logout
                 </DropdownItem>
               </DropdownContent>

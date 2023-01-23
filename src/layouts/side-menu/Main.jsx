@@ -1,3 +1,5 @@
+/** @format */
+
 import { Transition } from "react-transition-group";
 import { useState, useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";

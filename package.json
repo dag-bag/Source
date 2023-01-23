@@ -7,6 +7,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.0.0",
     "@ckeditor/ckeditor5-build-balloon": "^29.1.0",
     "@ckeditor/ckeditor5-build-balloon-block": "^29.1.0",
     "@ckeditor/ckeditor5-build-classic": "^29.1.0",
@@ -36,8 +37,10 @@
     "prop-types": "^15.8.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.29.0",
     "react-router-dom": "^6.3.0",
+    "react-select": "^5.7.0",
     "react-toastify": "^9.0.8",
     "react-transition-group": "^4.4.2",
     "recoil": "^0.7.0",

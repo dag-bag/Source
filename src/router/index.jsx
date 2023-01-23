@@ -79,6 +79,7 @@ function Router() {
   const routes = [
     {
       path: "/",
+
       element: <SideMenu />,
       children: [
         {

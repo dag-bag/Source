@@ -1,14 +1,16 @@
+/** @format */
+
 import DarkModeSwitcher from "@/components/dark-mode-switcher/Main";
 import dom from "@left4code/tw-starter/dist/js/dom";
 import logoUrl from "@/assets/images/logo.svg";
 import illustrationUrl from "@/assets/images/illustration.svg";
 import { useEffect } from "react";
-
+import { useAuth0 } from "@auth0/auth0-react";
 function Main() {
   useEffect(() => {
     dom("body").removeClass("main").removeClass("error-page").addClass("login");
   }, []);
-
+  const { loginWithRedirect } = useAuth0();
   return (
     <>
       <div>
@@ -51,7 +53,7 @@ function Main() {
                   A few more clicks to sign in to your account. Manage all your
                   e-commerce accounts in one place
                 </div>
-                <div className="intro-x mt-8">
+                {/* <div className="intro-x mt-8">
                   <input
                     type="text"
                     className="intro-x login__input form-control py-3 px-4 block"
@@ -78,9 +80,17 @@ function Main() {
                     </label>
                   </div>
                   <a href="">Forgot Password?</a>
-                </div>
+                </div> */}
                 <div className="intro-x mt-5 xl:mt-8 text-center xl:text-left">
-                  <button className="btn btn-primary py-3 px-4 w-full xl:w-32 xl:mr-3 align-top">
+                  <button
+                    className="btn btn-primary py-3 px-4 w-full xl:w-32 xl:mr-3 align-top"
+                    onClick={() =>
+                      loginWithRedirect({
+                        authorizationParams:
+                          "openid email user_metadata app_metadata picture",
+                      })
+                    }
+                  >
                     Login
                   </button>
                   <button className="btn btn-outline-secondary py-3 px-4 w-full xl:w-32 mt-3 xl:mt-0 align-top">
