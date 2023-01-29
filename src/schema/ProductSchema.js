@@ -6,6 +6,7 @@ const stringRequired = Yup.string()
   .min(2, "Too Short")
   .max(50, "Too Long")
   .required("Required");
+const longString = Yup.string().min(2, "Too Short").required("Required");
 const ArrayRequired = Yup.array().required("Required");
 const NumRequired = Yup.number().required("Required");
 let VariantSchema = Yup.object().shape({
@@ -16,12 +17,12 @@ let VariantSchema = Yup.object().shape({
   sellPrice: NumRequired,
   slug: stringRequired,
   availableQty: NumRequired,
-  metadesc: stringRequired,
-  title: stringRequired,
+  metadesc: longString,
+  title: longString,
 });
 export const ProductSchema = Yup.object().shape({
   title: stringRequired,
-  desc: stringRequired,
+  desc: longString,
   category: stringRequired,
   variant: Yup.array().of(VariantSchema),
   tag: stringRequired,
